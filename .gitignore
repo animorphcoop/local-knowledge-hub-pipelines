@@ -3,9 +3,18 @@ __pycache__
 
 /litellm
 
+# Ignore everything except Python files in pipelines dir
+#/pipelines/**/*!
+#!/pipelines/**/*.py
+/pipelines/!**/*.py
 
-pipelines/*
-!pipelines/.gitignore
+
+data/*
+!data/.gitignore
+
+indexes/*
+!indexes/.gitignore
+
 .DS_Store
 
 .venv
