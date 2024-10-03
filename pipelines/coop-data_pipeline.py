@@ -11,7 +11,7 @@ description: A pipeline for retrieving relevant information from a knowledge bas
 from typing import List, Union, Generator, Iterator
 from schemas import OpenAIChatMessage
 import os
-import logging 
+import logging
 import sys
 
 from pydantic import BaseModel
@@ -56,21 +56,35 @@ class Pipeline:
 
         # This function is called when the server is started.
         global documents, index
-        
-        #print('loading data dir with SimpleDirectoryReader')
-        #self.documents = SimpleDirectoryReader(input_files=["data/worldwide_coop_data.csv"]).load_data()
-        #print('loaded finished')
-        #print('building index from docs')
-        #self.index = VectorStoreIndex.from_documents(self.documents)	
-        #print('index built')
-        #print('storing index')
-        ##self.index.storage_context.persist(persist_dir='./indexes/')
-        #print('index stored')
-        
-        print('loading stored index')
-        storage_context = StorageContext.from_defaults(persist_dir='indexes/coop-data-pipeline')
-        self.index = load_index_from_storage(storage_context)
-        
+
+        # saving data the first time
+        indexes_dir = 'indexes/coop-data_pipeline'
+        # path to the csv file, e.g. co-op data present on https://www.uk.coop/resources/open-data
+        data_path = 'data/co-op_directory.csv'
+
+        # index can be stored in indexes/coop-data-pipeline
+        if os.path.isdir(indexes_dir) and bool(os.listdir(indexes_dir)):
+            print('found a stored index, loading ir')
+            storage_context = StorageContext.from_defaults(
+                persist_dir=indexes_dir)
+            self.index = load_index_from_storage(storage_context)
+
+        else:
+            print('loading data dir with SimpleDirectoryReader')
+            try:
+                assert os.path.isfile(data_path)
+                self.documents = SimpleDirectoryReader(
+                    input_files=[data_path]).load_data()
+            except AssertionError:
+                print('error loading data - please place first a csv file in data directory')
+            print('loaded finished')
+            print('building index from docs')
+            self.index = VectorStoreIndex.from_documents(self.documents)
+            print('index built')
+            print('storing index')
+            # self.index.storage_context.persist(persist_dir='./indexes/coop-data-pipeline')
+            print('index stored')
+            ...
         pass
 
     async def on_shutdown(self):
@@ -85,14 +99,14 @@ class Pipeline:
 
         print(messages)
         print(user_message)
-        
+
         print('building query engine from index')
         query_engine = self.index.as_query_engine(streaming=True)
-        #chat_engine = self.index.as_chat_engine()
+        # chat_engine = self.index.as_chat_engine()
         print('query engine built')
         print('building response from query engine and user prompt')
         response = query_engine.query(user_message)
-        #response = chat_engine.chat(user_message)
+        # response = chat_engine.chat(user_message)
         print('response built')
 
         return response.response_gen

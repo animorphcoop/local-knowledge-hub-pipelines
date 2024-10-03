@@ -51,11 +51,9 @@ class Pipeline:
 
         # This function is called when the server is started.
         global documents, index
-        print('loading data dir with SimpleDirectoryReader')
-               
-        #self.documents = WholeSiteReader(prefix='https://www.webarchitects.co.uk').load_data(base_url='https://www.webarchitects.co.uk')
-        self.documents = SimpleWebPageReader(html_to_text=True).load_data(['https://www.webarchitects.co.uk/hosting', 'https://www.webarchitects.co.uk/support', 'https://www.webarchitects.co.uk/about', 'https://www.webarchitects.co.uk/help'])
-        #self.documents = SimpleDirectoryReader("data", recursive=False).load_data()
+        print('loading data dir with SimpleWebPageReader')
+        self.documents = SimpleWebPageReader(html_to_text=True).load_data([
+            'your_webpage1', 'your_webpage2'])
         print('loaded finished')
         print('building index from docs')
         self.index = VectorStoreIndex.from_documents(self.documents)
@@ -75,7 +73,7 @@ class Pipeline:
 
         print(messages)
         print(user_message)
-        
+
         print('building query engine from index')
         query_engine = self.index.as_query_engine(streaming=True)
         print('query engine built')

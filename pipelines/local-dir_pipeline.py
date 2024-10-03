@@ -11,7 +11,7 @@ description: A pipeline for retrieving relevant information from a knowledge bas
 from typing import List, Union, Generator, Iterator
 from schemas import OpenAIChatMessage
 import os
-import logging 
+import logging
 import sys
 
 from pydantic import BaseModel
@@ -57,14 +57,16 @@ class Pipeline:
         # This function is called when the server is started.
         global documents, index
         print('loading data dir with SimpleDirectoryReader')
-        self.documents = SimpleDirectoryReader("data/properties", recursive=False).load_data()
+        self.documents = SimpleDirectoryReader(
+            "data/properties", recursive=False).load_data()  # directory with pdfs of poperties
         print('loaded finished')
         print('building index from docs')
-        self.index = VectorStoreIndex.from_documents(self.documents)	
+        self.index = VectorStoreIndex.from_documents(self.documents)
         print(self.index)
         print('index built')
         print('storing index')
-        self.index.storage_context.persist(persist_dir='./indexes/properties-pipeline')
+        self.index.storage_context.persist(
+            persist_dir='./indexes/properties-pipeline')
         print('index stored')
         pass
 
@@ -80,14 +82,14 @@ class Pipeline:
 
         print(messages)
         print(user_message)
-        
+
         print('building query engine from index')
         query_engine = self.index.as_query_engine(streaming=True)
-        #chat_engine = self.index.as_chat_engine()
+        # chat_engine = self.index.as_chat_engine()
         print('query engine built')
         print('building response from query engine and user prompt')
         response = query_engine.query(user_message)
-        #response = chat_engine.chat(user_message)
+        # response = chat_engine.chat(user_message)
         print('response built')
 
         return response.response_gen
