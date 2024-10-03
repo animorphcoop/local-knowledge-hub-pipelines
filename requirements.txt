@@ -14,10 +14,10 @@ aiohttp==3.9.5
 httpx
 
 # AI libraries
-openai
-anthropic
-google-generativeai
-vertexai
+#openai
+#anthropic
+#google-generativeai
+#vertexai
 
 # Database
 pymongo
@@ -64,3 +64,5 @@ beautifulsoup4
 # Llama Index for RAG
 llama-index
 llama-index-llms-ollama
+llama-index-embeddings-ollama
+llama-index-readers-web
